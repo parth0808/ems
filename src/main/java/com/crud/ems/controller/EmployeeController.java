@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/employees")
@@ -18,10 +20,31 @@ public class EmployeeController {
         EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
-    @GetMapping
-    public ResponseEntity<EmployeeDto> getEmployeeById(@RequestParam Long employeeId){
-        EmployeeDto employeeById = employeeService.getEmployeeById(employeeId);
-        return new ResponseEntity<>(employeeById, HttpStatus.OK);
+    @GetMapping("{id}")
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("id") Long employeeId){
+
+            EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId);
+            return ResponseEntity.ok(employeeDto);
+
+
     }
 
+    @GetMapping
+    public ResponseEntity<List<EmployeeDto>> getAllEmployees(){
+        List<EmployeeDto> employees = employeeService.getAllEmployees();
+        return ResponseEntity.ok(employees);
+    }
+
+    //Update employee API
+    @PutMapping("{id}")
+    public ResponseEntity<EmployeeDto> updateEmployeeDetails(@PathVariable("id") Long employeeId, @RequestBody EmployeeDto updateEmployeeDetails){
+        EmployeeDto employeeDto = employeeService.updateEmployeeDetails(employeeId,updateEmployeeDetails);
+        return new ResponseEntity<>(employeeDto,HttpStatus.OK);
+    }
+
+    @DeleteMapping("{id}")
+    public  ResponseEntity<String> deleteEmployee(@PathVariable("id") Long employeeId){
+        employeeService.deleteEmployee(employeeId);
+        return ResponseEntity.ok("Employee deleted successfully");
+    }
 }

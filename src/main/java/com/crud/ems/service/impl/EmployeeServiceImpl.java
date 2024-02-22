@@ -9,6 +9,9 @@ import com.crud.ems.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
@@ -30,5 +33,34 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         return EmployeeMapper.mapToEmployeeDto(employee);
+    }
+
+    @Override
+    public List<EmployeeDto> getAllEmployees() {
+        List<Employee> employees = employeeRepository.findAll();
+        return employees.stream().map(EmployeeMapper::mapToEmployeeDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EmployeeDto updateEmployeeDetails(Long employeeId, EmployeeDto updateEmployeeDetails) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(
+                () -> new ResourceNotFoundException("Employee doesn't exist with employee id"+employeeId)
+        );
+        employee.setFirstName(updateEmployeeDetails.getFirstName());
+        employee.setLastName(updateEmployeeDetails.getLastName());
+        employee.setEmail(updateEmployeeDetails.getEmail());
+        Employee updatedEmployeeDetails = employeeRepository.save(employee);
+        return EmployeeMapper.mapToEmployeeDto(updatedEmployeeDetails);
+    }
+
+    @Override
+    public void deleteEmployee(Long employeeId) {
+        employeeRepository.findById(employeeId).orElseThrow(
+                () -> new ResourceNotFoundException("Employee doesn't exist with employee id"+employeeId)
+        );
+        employeeRepository.deleteById(employeeId);
+
+
     }
 }
